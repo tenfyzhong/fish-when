@@ -5,14 +5,14 @@ convert timestamp/datetime
 
 # usage
 ```
-when: convert tiemstamp/datetime
+when: convert timestamp/datetime
 Usage: when [options] [timestamp/datetime]
 
 Options:
   -d/--datetime       convert timestamp to datetime
   -t/--timestamp      convert datetime to timestamp, any format which support by `date` is supported
   --ms                the time unit is millisecond
-  --tz [+|-]timezone  the timezone to use when displaying dates. default is the local timezone
+  --tz timezone       the timezone to use when displaying dates. default is the local timezone
   -h/--help           print this help message
 ```
 

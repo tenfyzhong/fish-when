@@ -7,37 +7,32 @@ function when --description 'Format timestamp'
     end
 
     set -l t $argv
+    set -l date_style (_when_detect_date_style)
 
-    if test -n "$_flag_tz"
-        if string match -q -r '^\d{1,2}(?::\d{2})?$' -- "$_flag_tz"
-            set _tz "-$_flag_tz"
-            # set -x TZ "UTC-$_tz"
-        else if string match -q -r '^\+\d{1,2}(?::\d{2})?$' -- "$_flag_tz"
-            set _tz (string replace + - "$_flag_tz")
-            # set -x TZ "UTC$_tz"
-        else if string match -q -r '^_\d{1,2}(?::\d{2})?$' -- "$_flag_tz"
-            set _tz (string replace _ + "$_flag_tz")
-            # set -x TZ "UTC$_tz"
-        else
-            echo "--tz is invalid" >&2
-            return 2
-        end
+    if test "$date_style" = "unknown"
+        echo "Unsupport `date` command" >&2
+        return 1
     end
 
     _when_bak_tz
-    if test -n "$_tz"
-        set -x TZ "UTC$_tz"
+    if test -n "$_flag_tz"
+        set -x TZ "$_flag_tz"
     end
 
     if set -q _flag_datetime
         if test -z "$argv"
-            date +'%F %T'
+            date +'%F %T %Z'
         else
             if set -q _flag_ms
                 set t (math "floor($t/1000)")
             end
 
-            date +'%F %T' -d @"$t"
+            # date +'%F %T %Z' -d @"$t"
+            if test "$date_style" = "gnu"
+                date +'%F %T %Z' -d @"$t"
+            else
+                date -j -f "%s" "$t" +'%F %T %Z'
+            end
         end
         _when_restore_tz
         return 0
@@ -45,7 +40,12 @@ function when --description 'Format timestamp'
         if test -z "$argv"
             set ts (date +"%s")
         else
-            set ts (date -d"$t" +"%s")
+            # set ts (date -d"$t" +"%s")
+            if test "$date_style" = "gnu"
+                set ts (date -d "$t" +"%s")
+            else
+                set ts (date -j -f "%a %b %d %T %Z %Y" "$t" +"%s" 2>/dev/null || date -j -f "%F %T" "$t" +"%s" 2>/dev/null || date -j -f "%F" "$t" +"%s")
+            end
         end
         if set -q _flag_ms
             set ts (math "$ts*1000")
@@ -54,7 +54,7 @@ function when --description 'Format timestamp'
         _when_restore_tz
         return 0
     else
-        date +'%F %T'
+        date +'%F %T %Z'
         _when_restore_tz
         return 0
     end
@@ -62,14 +62,14 @@ end
 
 function _when_help
     printf %s\n\
-        'when: convert tiemstamp/datetime'\
+        'when: convert timestamp/datetime'\
         'Usage: when [options] [timestamp/datetime]'\
         ''\
         'Options:'\
         '  -d/--datetime       convert timestamp to datetime'\
         '  -t/--timestamp      convert datetime to timestamp, any format which support by `date` is supported'\
         '  --ms                the time unit is millisecond'\
-        '  --tz [+|-]timezone  the timezone to use when displaying dates. default is the local timezone'\
+        '  --tz timezone  the timezone to use when displaying dates. default is the local timezone'\
         '  -h/--help           print this help message'
 end
 
@@ -80,4 +80,14 @@ end
 function _when_restore_tz
     set -x TZ "$store_tz"
     set -e store_tz
+end
+
+function _when_detect_date_style
+    if date -d "now" +%s >/dev/null 2>&1
+        echo "gnu"
+    else if date -j -f "%s" (date +%s) >/dev/null 2>&1
+        echo "bsd"
+    else
+        echo "unknown"
+    end
 end

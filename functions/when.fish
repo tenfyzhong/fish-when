@@ -21,7 +21,7 @@ function when --description 'Format timestamp'
 
     if set -q _flag_datetime
         if test -z "$argv"
-            date +'%F %T %Z'
+            date +'%F %T %Z %:z'
         else
             if set -q _flag_ms
                 set t (math "floor($t/1000)")
@@ -29,9 +29,9 @@ function when --description 'Format timestamp'
 
             # date +'%F %T %Z' -d @"$t"
             if test "$date_style" = "gnu"
-                date +'%F %T %Z' -d @"$t"
+                date +'%F %T %Z %:z' -d @"$t"
             else
-                date -j -f "%s" "$t" +'%F %T %Z'
+                date -j -f "%s" "$t" +'%F %T %Z %:z'
             end
         end
         _when_restore_tz
@@ -54,7 +54,7 @@ function when --description 'Format timestamp'
         _when_restore_tz
         return 0
     else
-        date +'%F %T %Z'
+        date +'%F %T %Z %:z'
         _when_restore_tz
         return 0
     end

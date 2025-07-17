@@ -12,8 +12,9 @@ function _when_complete_tz
 end
 
 complete when -f
-complete when -s d -l datetime -d 'convert timestamp to datetime'
-complete when -s t -l timestamp -d 'convert datetime to timestamp, any format which support by `date` is supported'
-complete when -l ms -d 'the time unit is millisecond'
-complete when -k -r -f -l tz -a "(_when_complete_tz)" -d 'the timezone to use when displaying dates.'
-complete when -s h -l help -d 'print this help message'
+complete when -s d -l datetime -d 'Convert timestamp to datetime (overrides -t if set)'
+complete when -s t -l timestamp -d 'Convert datetime to timestamp (supports various date formats)'
+complete when -s s -d 'Treat input/output as seconds (overrides --ms if set)'
+complete when -l ms -d 'Treat input/output as milliseconds (default for numeric input)'
+complete when -k -r -f -l tz -a "(_when_complete_tz)" -d 'Use specified timezone (default: local timezone)'
+complete when -s h -l help -d 'Show this help message'

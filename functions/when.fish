@@ -1,5 +1,5 @@
 function when --description 'Format timestamp'
-    argparse -i t/timestamp d/datetime ms 'tz=' h/help -- $argv 2>/dev/null
+    argparse -i t/timestamp d/datetime ms s 'tz=' h/help -- $argv 2>/dev/null
 
     if set -q _flag_help
         _when_help
@@ -44,8 +44,12 @@ function when --description 'Format timestamp'
         if test -z "$argv"
             date +'%F %T %Z %:z'
         else
-            if set -q _flag_ms
+            if set -q _flag_s
+                # nothing to do
+            else if set -q _flag_ms
                 set t (math "floor($t/1000)")
+            else
+                set t (string length -- "$t" | grep -q '^1[0-2]$' && echo "$t" || math "floor($t/1000)")
             end
 
             # date +'%F %T %Z' -d @"$t"
@@ -83,15 +87,23 @@ end
 
 function _when_help
     printf %s\n \
-        'when: convert timestamp/datetime' \
-        'Usage: when [options] [timestamp/datetime]' \
+        'when - Convert between timestamps and human-readable datetime formats' \
+        '' \
+        'Usage:' \
+        '  when [OPTIONS] [TIMESTAMP|DATETIME]' \
         '' \
         'Options:' \
-        '  -d/--datetime       convert timestamp to datetime' \
-        '  -t/--timestamp      convert datetime to timestamp, any format which support by `date` is supported' \
-        '  --ms                the time unit is millisecond' \
-        '  --tz timezone  the timezone to use when displaying dates. default is the local timezone' \
-        '  -h/--help           print this help message'
+        '  -d, --datetime   Convert timestamp to datetime (overrides -t if set)' \
+        '  -t, --timestamp  Convert datetime to timestamp (supports various date formats)' \
+        '  -s               Treat input/output as seconds (overrides --ms if set)' \
+        '  --ms             Treat input/output as milliseconds (default for numeric input)' \
+        '  --tz TIMEZONE    Use specified timezone (default: local timezone)' \
+        '  -h, --help       Show this help message' \
+        '' \
+        'Examples:' \
+        '  when 1635724800              # Convert timestamp to datetime' \
+        '  when 2021-10-31 10:11:12     # Convert date to timestamp' \
+        '  when --ms 1635724800000      # Handle millisecond timestamps'
 end
 
 function _when_bak_tz

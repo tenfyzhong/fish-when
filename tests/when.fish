@@ -1,5 +1,6 @@
 # 2025-01-01 00:00:00 timezone 0 = 1735689600
 set basetime250101 1735689600
+set basetime_large 1735689600000
 set basetimems250101 1735689600000
 set basedate250101 "2025-01-01 00:00:00"
 
@@ -9,13 +10,28 @@ set -gx TZ Asia/Shanghai
 @test "when -d $basetime250101 = 2025-01-01 08:00:00" (when -d $basetime250101) = "2025-01-01 08:00:00 CST +08:00"
 @test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
 
+@test "when -s -d $basetime_large = 2025-01-01 08:00:00" (when -s -d $basetime_large) = "+56971-10-25 08:00:00 CST +08:00"
+@test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
+
+@test "when -s 173568960000 = 2025-01-01 08:00:00" (when -s 173568960000) = "7470-03-08 08:00:00 CST +08:00"
+@test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
+
+@test "when -s -d $basetime250101 = 2025-01-01 08:00:00" (when -s -d $basetime250101) = "2025-01-01 08:00:00 CST +08:00"
+@test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
+
 @test "when $basetime250101 = 2025-01-01 08:00:00" (when $basetime250101) = "2025-01-01 08:00:00 CST +08:00"
 @test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
 
 @test "when -d $basetimems250101 --ms = 2025-01-01 08:00:00" (when -d $basetimems250101 --ms) = "2025-01-01 08:00:00 CST +08:00"
 @test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
 
+@test "when -d $basetimems250101 = 2025-01-01 08:00:00" (when -d $basetimems250101) = "2025-01-01 08:00:00 CST +08:00"
+@test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
+
 @test "when $basetimems250101 --ms = 2025-01-01 08:00:00" (when $basetimems250101 --ms) = "2025-01-01 08:00:00 CST +08:00"
+@test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
+
+@test "when $basetimems250101 = 2025-01-01 08:00:00" (when $basetimems250101) = "2025-01-01 08:00:00 CST +08:00"
 @test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
 
 @test "when -t '2025-01-01 08:00:00' = $basetime250101" (when -t '2025-01-01 08:00:00') -eq $basetime250101

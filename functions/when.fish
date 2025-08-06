@@ -7,6 +7,12 @@ function when --description 'Format timestamp'
     end
 
     set -l t $argv
+    if test -z "$t"
+        if not isatty stdin
+            read -L t
+        end
+    end
+
     set -l date_style (_when_detect_date_style)
 
     if test "$date_style" = unknown
@@ -41,7 +47,7 @@ function when --description 'Format timestamp'
     end
 
     if test "$to_datetime" = 1
-        if test -z "$argv"
+        if test -z "$t"
             date +'%F %T %Z %:z'
         else
             if set -q _flag_s
@@ -62,7 +68,7 @@ function when --description 'Format timestamp'
         _when_restore_tz
         return 0
     else if test "$to_datetime" = 0
-        if test -z "$argv"
+        if test -z "$t"
             set ts (date +"%s")
         else
             # set ts (date -d"$t" +"%s")
@@ -101,9 +107,10 @@ function _when_help
         '  -h, --help       Show this help message' \
         '' \
         'Examples:' \
-        '  when 1635724800              # Convert timestamp to datetime' \
-        '  when 2021-10-31 10:11:12     # Convert date to timestamp' \
-        '  when --ms 1635724800000      # Handle millisecond timestamps'
+        '  when 1635724800                  # Convert timestamp to datetime' \
+        '  when 2021-10-31 10:11:12         # Convert date to timestamp' \
+        '  when --ms 1635724800000          # Handle millisecond timestamps' \
+        '  echo 1635724800000 | when --ms   # Handle millisecond timestamps'
 end
 
 function _when_bak_tz

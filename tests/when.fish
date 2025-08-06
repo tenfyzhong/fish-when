@@ -70,5 +70,14 @@ set -gx TZ Asia/Shanghai
 @test "when --tz US/Eastern 2025-04-30 12:00:00 EDT = 1746028800 " (when --tz US/Eastern 2025-04-30 12:00:00 EDT) = 1746028800
 @test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
 
+@test "echo '2025-01-01 08:00:00' | when = $basetime250101" (echo '2025-01-01 08:00:00' | when) -eq $basetime250101
+@test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
+
+@test "echo '2025-01-01 08:00:00' | when = $basetimems250101" (echo '2025-01-01 08:00:00' | when --ms) -eq $basetimems250101
+@test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
+
+@test "echo $basetimems250101 | when = 2025-01-01 08:00:00" (echo $basetimems250101 | when) = "2025-01-01 08:00:00 CST +08:00"
+@test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
+
 set TZ "$store_tz"
 set -e store_tz

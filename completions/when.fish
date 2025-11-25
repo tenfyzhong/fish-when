@@ -14,7 +14,8 @@ end
 complete when -f
 complete when -s d -l datetime -d 'Convert timestamp to datetime (overrides -t if set)'
 complete when -s t -l timestamp -d 'Convert datetime to timestamp (supports various date formats)'
-complete when -s s -d 'Treat input/output as seconds (overrides --ms if set)'
 complete when -l ms -d 'Treat input/output as milliseconds (default for numeric input)'
 complete when -k -r -f -l tz -a "(_when_complete_tz)" -d 'Use specified timezone (default: local timezone)'
+complete when -s a -l add -x -d 'Add duration to time (e.g. 1d2h3m4s)'
+complete when -s s -l sub -x -d 'Subtract duration from time (e.g. 1d2h3m4s)'
 complete when -s h -l help -d 'Show this help message'

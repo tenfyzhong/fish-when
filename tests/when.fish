@@ -1,22 +1,13 @@
+source functions/when.fish
+
 # 2025-01-01 00:00:00 timezone 0 = 1735689600
 set basetime250101 1735689600
-set basetime_large 1735689600000
 set basetimems250101 1735689600000
-set basedate250101 "2025-01-01 00:00:00"
 
 set -gx store_tz "$TZ"
 set -gx TZ Asia/Shanghai
 
 @test "when -d $basetime250101 = 2025-01-01 08:00:00" (when -d $basetime250101) = "2025-01-01 08:00:00 CST +08:00"
-@test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
-
-@test "when -s -d $basetime_large = 2025-01-01 08:00:00" (when -s -d $basetime_large) = "+56971-10-25 08:00:00 CST +08:00"
-@test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
-
-@test "when -s 173568960000 = 2025-01-01 08:00:00" (when -s 173568960000) = "7470-03-08 08:00:00 CST +08:00"
-@test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
-
-@test "when -s -d $basetime250101 = 2025-01-01 08:00:00" (when -s -d $basetime250101) = "2025-01-01 08:00:00 CST +08:00"
 @test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
 
 @test "when $basetime250101 = 2025-01-01 08:00:00" (when $basetime250101) = "2025-01-01 08:00:00 CST +08:00"
@@ -77,6 +68,50 @@ set -gx TZ Asia/Shanghai
 @test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
 
 @test "echo $basetimems250101 | when = 2025-01-01 08:00:00" (echo $basetimems250101 | when) = "2025-01-01 08:00:00 CST +08:00"
+@test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
+
+set TZ "$store_tz"
+set -e store_tz
+
+# Tests for -a/--add and -s/--sub
+set -gx store_tz "$TZ"
+set -gx TZ Asia/Shanghai
+
+# 1d = 86400s
+@test "when -a 1d $basetime250101 = 2025-01-02 08:00:00" (when -a 1d $basetime250101) = "2025-01-02 08:00:00 CST +08:00"
+@test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
+
+# 1h = 3600s
+@test "when -a 1h $basetime250101 = 2025-01-01 09:00:00" (when -a 1h $basetime250101) = "2025-01-01 09:00:00 CST +08:00"
+@test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
+
+# 1m = 60s
+@test "when -a 1m $basetime250101 = 2025-01-01 08:01:00" (when -a 1m $basetime250101) = "2025-01-01 08:01:00 CST +08:00"
+@test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
+
+# 1s = 1s
+@test "when -a 1s $basetime250101 = 2025-01-01 08:00:01" (when -a 1s $basetime250101) = "2025-01-01 08:00:01 CST +08:00"
+@test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
+
+# 1d1h1m1s = 90061s
+@test "when -a 1d1h1m1s $basetime250101 = 2025-01-02 09:01:01" (when -a 1d1h1m1s $basetime250101) = "2025-01-02 09:01:01 CST +08:00"
+@test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
+
+# Subtraction
+@test "when -s 1d $basetime250101 = 2024-12-31 08:00:00" (when --sub 1d $basetime250101) = "2024-12-31 08:00:00 CST +08:00"
+@test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
+
+@test "when -s 1h $basetime250101 = 2025-01-01 07:00:00" (when --sub 1h $basetime250101) = "2025-01-01 07:00:00 CST +08:00"
+@test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
+
+# Add to timestamp output
+# 1735689600 + 3600 = 1735693200
+@test "when -t '2025-01-01 08:00:00' -a 1h = 1735693200" (when -t '2025-01-01 08:00:00' -a 1h) -eq 1735693200
+@test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
+
+# Sub from timestamp output
+# 1735689600 - 3600 = 1735686000
+@test "when -t '2025-01-01 08:00:00' --sub 1h = 1735686000" (when -t '2025-01-01 08:00:00' --sub 1h) -eq 1735686000
 @test "test TZ = Asia/Shanghai" "$TZ" = Asia/Shanghai
 
 set TZ "$store_tz"
